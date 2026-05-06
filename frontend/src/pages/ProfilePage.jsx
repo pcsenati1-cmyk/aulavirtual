@@ -55,7 +55,8 @@ export const ProfilePage = () => {
   };
 
   const initials = perfil?.nombre?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
-  const fotoSrc = fotoPreview || (perfil?.foto_url ? `http://localhost:3001${perfil.foto_url}` : null);
+  const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+  const fotoSrc = fotoPreview || (perfil?.foto_url ? `${apiBase}${perfil.foto_url}` : null);
 
   return (
     <div className="space-y-6 max-w-2xl">
