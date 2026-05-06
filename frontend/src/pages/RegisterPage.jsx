@@ -31,12 +31,11 @@ const PasswordStrength = ({ password = '' }) => {
 };
 
 export const RegisterPage = () => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm({ defaultValues: { rol: 'estudiante' } });
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const passwordValue = watch('password', '');
-  const rolValue = watch('rol');
 
   useEffect(() => {
     gsap.fromTo('.register-card', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' });
@@ -133,30 +132,6 @@ export const RegisterPage = () => {
               </div>
               <PasswordStrength password={passwordValue} />
               {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
-            </div>
-
-            {/* Rol */}
-            <div>
-              <label className="form-label">Rol</label>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: 'estudiante', label: 'Estudiante', icon: '🎓' },
-                  { value: 'profesor',   label: 'Profesor',   icon: '👨‍🏫' },
-                ].map(({ value, label, icon }) => (
-                  <label
-                    key={value}
-                    className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                      rolValue === value
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <input type="radio" {...register('rol')} value={value} className="sr-only" />
-                    <span className="text-xl">{icon}</span>
-                    <span className="font-medium text-sm">{label}</span>
-                  </label>
-                ))}
-              </div>
             </div>
 
             <Button type="submit" className="w-full mt-2" size="lg" loading={loading}>

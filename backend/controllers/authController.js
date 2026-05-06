@@ -29,13 +29,11 @@ const validatePassword = (password) => {
 
 exports.register = async (req, res, next) => {
   try {
-    const { nombre, email, password, rol = 'estudiante' } = req.body;
+    const { nombre, email, password } = req.body;
+    const rol = 'estudiante'; // siempre estudiante, el admin asigna otros roles
 
     if (!nombre || !email || !password)
       return next(AppError.badRequest('Nombre, email y contraseña son obligatorios'));
-
-    if (!['estudiante', 'profesor'].includes(rol))
-      return next(AppError.badRequest('Rol inválido. Debe ser estudiante o profesor'));
 
     // Validar contraseña
     const pwErrors = validatePassword(password);
