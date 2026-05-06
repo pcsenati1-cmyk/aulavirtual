@@ -9,25 +9,31 @@ exports.getAll = async (req, res, next) => {
     const offset = (page - 1) * limit;
     const search = req.query.search ? `%${req.query.search}%` : null;
 
-    const whereClause = search ? 'WHERE (u.nombre LIKE ? OR c.titulo LIKE ?)' : '';
-    const searchParams = search ? [search, search] : [];
+    // Estudiantes solo ven sus propias inscripciones
+    const userId = req.user.rol === 'estudiante' ? req.user.userId : null;
+
+    const conditions = [];
+    const params = [];
+    if (userId) { conditions.push('i.usuario_id = ?'); params.push(userId); }
+    if (search) { conditions.push('(u.nombre LIKE ? OR c.titulo LIKE ?)'); params.push(search, search); }
+    const whereClause = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
 
     const [[{ total }]] = await db.execute(
       `SELECT COUNT(*) AS total FROM inscripciones i
        JOIN usuarios u ON i.usuario_id = u.id JOIN cursos c ON i.curso_id = c.id
-       ${whereClause}`, searchParams
+       ${whereClause}`, params
     );
     const [rows] = await db.execute(
       `SELECT i.id, i.fecha_inscripcion, i.estado,
          u.id AS usuario_id, u.nombre AS usuario_nombre, u.email AS usuario_email, u.rol AS usuario_rol,
-         c.id AS curso_id, c.titulo AS curso_titulo, c.categoria,
+         c.id AS curso_id, c.titulo AS curso_titulo, c.categoria, c.duracion_horas,
          p.nombre AS profesor_nombre
        FROM inscripciones i
        JOIN usuarios u ON i.usuario_id = u.id
        JOIN cursos c ON i.curso_id = c.id
        LEFT JOIN usuarios p ON c.profesor_id = p.id
        ${whereClause} ORDER BY i.fecha_inscripcion DESC LIMIT ${limit} OFFSET ${offset}`,
-      searchParams
+      params
     );
     res.json({ success: true, data: rows, meta: { total, page, limit, pages: Math.ceil(total / limit) } });
   } catch (err) { next(err); }

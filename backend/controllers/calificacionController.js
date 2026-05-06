@@ -9,13 +9,19 @@ exports.getAll = async (req, res, next) => {
     const offset = (page - 1) * limit;
     const search = req.query.search ? `%${req.query.search}%` : null;
 
-    const whereClause = search ? 'WHERE (u.nombre LIKE ? OR c.titulo LIKE ?)' : '';
-    const searchParams = search ? [search, search] : [];
+    // Estudiantes solo ven sus propias calificaciones
+    const userId = req.user.rol === 'estudiante' ? req.user.userId : null;
+
+    const conditions = [];
+    const params = [];
+    if (userId) { conditions.push('cal.usuario_id = ?'); params.push(userId); }
+    if (search) { conditions.push('(u.nombre LIKE ? OR c.titulo LIKE ?)'); params.push(search, search); }
+    const whereClause = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
 
     const [[{ total }]] = await db.execute(
       `SELECT COUNT(*) AS total FROM calificaciones cal
        JOIN usuarios u ON cal.usuario_id = u.id JOIN cursos c ON cal.curso_id = c.id
-       ${whereClause}`, searchParams
+       ${whereClause}`, params
     );
     const [rows] = await db.execute(
       `SELECT cal.id, cal.nota, cal.comentario, cal.fecha, cal.updated_at,
@@ -25,7 +31,7 @@ exports.getAll = async (req, res, next) => {
        JOIN usuarios u ON cal.usuario_id = u.id
        JOIN cursos c ON cal.curso_id = c.id
        ${whereClause} ORDER BY cal.fecha DESC LIMIT ${limit} OFFSET ${offset}`,
-      searchParams
+      params
     );
     res.json({ success: true, data: rows, meta: { total, page, limit, pages: Math.ceil(total / limit) } });
   } catch (err) { next(err); }

@@ -13,8 +13,18 @@ exports.upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } }); //
 exports.getTareas = async (req, res, next) => {
   try {
     const { curso_id } = req.query;
-    const where = curso_id ? 'WHERE t.curso_id = ?' : '';
-    const params = curso_id ? [curso_id] : [];
+    const conditions = [];
+    const params = [];
+
+    if (curso_id) { conditions.push('t.curso_id = ?'); params.push(curso_id); }
+
+    // Estudiantes solo ven tareas de sus cursos inscritos
+    if (req.user.rol === 'estudiante') {
+      conditions.push('t.curso_id IN (SELECT curso_id FROM inscripciones WHERE usuario_id = ?)');
+      params.push(req.user.userId);
+    }
+
+    const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
     const [rows] = await db.execute(
       `SELECT t.*, c.titulo AS curso_titulo,
          (SELECT COUNT(*) FROM entregas e WHERE e.tarea_id = t.id) AS total_entregas
