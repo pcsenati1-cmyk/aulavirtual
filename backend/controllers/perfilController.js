@@ -29,26 +29,30 @@ exports.getPerfil = async (req, res, next) => {
 
 exports.updatePerfil = async (req, res, next) => {
   try {
-    const { nombre, email } = req.body;
-    const foto_url = req.file ? `/uploads/fotos/${req.file.filename}` : undefined;
-    const fields = ['nombre=?', 'email=?'];
-    const values = [nombre, email];
+    const { nombre } = req.body;
+    const foto_url = req.file ? `/uploads/fotos/${req.file.filename}` : null;
+    const fields = [];
+    const values = [];
+    if (nombre) { fields.push('nombre=?'); values.push(nombre); }
     if (foto_url) { fields.push('foto_url=?'); values.push(foto_url); }
+    if (!fields.length) return res.json({ success: true, message: 'Sin cambios' });
     values.push(req.user.userId);
     await db.execute(`UPDATE usuarios SET ${fields.join(',')} WHERE id=?`, values);
-    res.json({ success: true, message: 'Perfil actualizado' });
+    const [[user]] = await db.execute('SELECT id, nombre, email, rol, foto_url FROM usuarios WHERE id=?', [req.user.userId]);
+    res.json({ success: true, message: 'Perfil actualizado', user });
   } catch (err) { next(err); }
 };
 
 exports.changePassword = async (req, res, next) => {
   try {
-    const { password_actual, password_nuevo } = req.body;
-    if (!password_actual || !password_nuevo)
+    const { password_actual, password_nueva, password_nuevo } = req.body;
+    const nueva = password_nueva || password_nuevo;
+    if (!password_actual || !nueva)
       return res.status(400).json({ success: false, message: 'Ambas contraseñas son requeridas' });
     const [[user]] = await db.execute('SELECT password FROM usuarios WHERE id=?', [req.user.userId]);
     const ok = await bcrypt.compare(password_actual, user.password);
     if (!ok) return res.status(401).json({ success: false, message: 'Contraseña actual incorrecta' });
-    const hashed = await bcrypt.hash(password_nuevo, 10);
+    const hashed = await bcrypt.hash(nueva, 10);
     await db.execute('UPDATE usuarios SET password=? WHERE id=?', [hashed, req.user.userId]);
     res.json({ success: true, message: 'Contraseña actualizada' });
   } catch (err) { next(err); }
