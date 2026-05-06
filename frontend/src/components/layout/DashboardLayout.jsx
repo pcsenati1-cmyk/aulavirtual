@@ -91,7 +91,8 @@ export const DashboardLayout = () => {
   };
 
   const initials = user?.nombre?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
-  const fotoSrc = user?.foto_url ? `http://localhost:3001${user.foto_url}` : null;
+  const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+  const fotoSrc = user?.foto_url ? `${apiBase}${user.foto_url}` : null;
 
   const bg = darkMode ? '#0f172a' : '#f1f5f9';
   const cardBg = darkMode ? '#1e293b' : '#fff';

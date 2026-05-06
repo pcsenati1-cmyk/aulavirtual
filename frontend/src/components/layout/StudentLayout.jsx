@@ -55,7 +55,8 @@ export const StudentLayout = () => {
   };
 
   const initials = user?.nombre?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'A';
-  const fotoSrc = user?.foto_url ? `http://localhost:3001${user.foto_url}` : null;
+  const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+    const fotoSrc = user?.foto_url ? `${apiBase}${user.foto_url}` : null;
 
   return (
     <div style={{ display: 'flex', height: '100vh', background: '#f8fafc', overflow: 'hidden' }}>
