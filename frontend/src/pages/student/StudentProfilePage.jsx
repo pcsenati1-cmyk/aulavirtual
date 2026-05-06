@@ -18,9 +18,10 @@ export const StudentProfilePage = () => {
 
   useEffect(() => {
     perfilService.get().then(r => {
-      const p = r.user || r;
+      const p = r.user || r.data || r;
       setPerfil(p);
       setForm({ nombre: p.nombre || '', email: p.email || '' });
+      login({ ...user, nombre: p.nombre, foto_url: p.foto_url }, token);
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 

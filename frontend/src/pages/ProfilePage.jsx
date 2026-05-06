@@ -18,7 +18,12 @@ export const ProfilePage = () => {
   const { register: regPass, handleSubmit: handlePass, reset: resetPass, formState: { errors: errPass } } = useForm();
 
   useEffect(() => {
-    perfilService.get().then(r => { setPerfil(r.data); reset({ nombre: r.data.nombre, email: r.data.email }); });
+    perfilService.get().then(r => {
+      setPerfil(r.data);
+      reset({ nombre: r.data.nombre, email: r.data.email });
+      // Sincronizar foto_url al store para que los avatares del sidebar se actualicen
+      login({ ...user, nombre: r.data.nombre, foto_url: r.data.foto_url }, localStorage.getItem('token'));
+    });
   }, []);
 
   const onSubmitPerfil = async (data) => {
