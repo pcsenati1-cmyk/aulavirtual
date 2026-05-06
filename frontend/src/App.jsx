@@ -8,6 +8,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
+import { useSessionCheck } from './hooks/useSessionCheck';
 import { Loader } from './components/ui/Loader';
 import { SkeletonDashboard } from './components/ui/Skeleton';
 
@@ -109,6 +110,7 @@ const PublicRoute = ({ children }) => {
 function App() {
   const [splash, setSplash] = useState(true);
   const { applyTheme } = useThemeStore();
+  useSessionCheck();
 
   useEffect(() => {
     applyTheme();
