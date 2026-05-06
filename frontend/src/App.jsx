@@ -26,6 +26,7 @@ import { RegisterPage } from './pages/RegisterPage';
 const DashboardPage      = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const CoursesPage        = lazy(() => import('./pages/CoursesPage').then(m => ({ default: m.CoursesPage })));
 const EnrollmentsPage    = lazy(() => import('./pages/EnrollmentsPage').then(m => ({ default: m.EnrollmentsPage })));
+const AdminSolicitudesPage = lazy(() => import('./pages/AdminSolicitudesPage').then(m => ({ default: m.AdminSolicitudesPage })));
 const UsersPage          = lazy(() => import('./pages/UsersPage').then(m => ({ default: m.UsersPage })));
 const GradesPage         = lazy(() => import('./pages/GradesPage').then(m => ({ default: m.GradesPage })));
 const AnnouncementsPage  = lazy(() => import('./pages/AnnouncementsPage').then(m => ({ default: m.AnnouncementsPage })));
@@ -137,6 +138,7 @@ function App() {
           <Route index element={<Suspense fallback={<PageLoader />}><DashboardPage /></Suspense>} />
           <Route path="cursos" element={<Suspense fallback={<PageLoader />}><CoursesPage /></Suspense>} />
           <Route path="inscripciones" element={<Suspense fallback={<PageLoader />}><EnrollmentsPage /></Suspense>} />
+          <Route path="solicitudes" element={<Suspense fallback={<PageLoader />}><AdminSolicitudesPage /></Suspense>} />
           <Route path="usuarios" element={<Suspense fallback={<PageLoader />}><UsersPage /></Suspense>} />
           <Route path="calificaciones" element={<Suspense fallback={<PageLoader />}><GradesPage /></Suspense>} />
           <Route path="anuncios" element={<Suspense fallback={<PageLoader />}><AnnouncementsPage /></Suspense>} />

@@ -56,7 +56,7 @@ export const LoginPage = () => {
           </div>
           <h1 className="text-4xl font-bold mb-4">Aula Virtual</h1>
           <p className="text-indigo-100 text-lg max-w-sm">
-            Sistema de gestión educativa para estudiantes y profesores
+            Sistema de gestión educativa
           </p>
           <div className="mt-10 grid grid-cols-3 gap-4 text-center">
             {[['100+', 'Cursos'], ['500+', 'Estudiantes'], ['50+', 'Profesores']].map(([num, label]) => (

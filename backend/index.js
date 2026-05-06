@@ -318,6 +318,7 @@ initDatabase().then(() => {
   app.use('/api/usuarios',       require('./routes/usuarios'));
   app.use('/api/cursos',         require('./routes/cursos'));
   app.use('/api/inscripciones',  require('./routes/inscripciones'));
+  app.use('/api/solicitudes',    require('./routes/solicitudes'));
   app.use('/api/calificaciones', require('./routes/calificaciones'));
   app.use('/api/anuncios',       require('./routes/anuncios'));
   app.use('/api/categorias',     require('./routes/categorias'));

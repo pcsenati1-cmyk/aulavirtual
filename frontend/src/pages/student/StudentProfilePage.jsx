@@ -59,7 +59,8 @@ export const StudentProfilePage = () => {
     }
   };
 
-  const fotoSrc = fotoPreview || (perfil?.foto_url ? `http://localhost:3001${perfil.foto_url}` : null);
+  const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+  const fotoSrc = fotoPreview || (perfil?.foto_url ? `${apiBase}${perfil.foto_url}` : null);
   const initials = user?.nombre?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'A';
 
   if (loading) return <p style={{ color: '#9ca3af', textAlign: 'center', padding: 40 }}>Cargando...</p>;

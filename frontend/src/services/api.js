@@ -147,6 +147,14 @@ export const healthService = {
   check: () => body(api.get('/health')),
 };
 
+export const solicitudService = {
+  crear: (d) => body(api.post('/solicitudes', d)),
+  getMias: () => list(api.get('/solicitudes/mias')),
+  getAll: (estado) => list(api.get('/solicitudes', { params: { estado } })),
+  aprobar: (id) => body(api.put(`/solicitudes/${id}/aprobar`)),
+  rechazar: (id) => body(api.put(`/solicitudes/${id}/rechazar`)),
+};
+
 // ── Upload con progreso — Mejora #44 ─────────────────────────
 export const uploadWithProgress = (url, formData, onProgress) =>
   body(api.post(url, formData, {

@@ -18,6 +18,7 @@ const navItems = [
   { path: '/app', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { path: '/app/cursos', icon: BookOpen, label: 'Cursos' },
   { path: '/app/inscripciones', icon: Calendar, label: 'Inscripciones' },
+  { path: '/app/solicitudes', icon: ClipboardList, label: 'Solicitudes' },
   { path: '/app/usuarios', icon: Users, label: 'Usuarios' },
   { path: '/app/calificaciones', icon: Award, label: 'Calificaciones' },
   { path: '/app/anuncios', icon: Megaphone, label: 'Anuncios' },

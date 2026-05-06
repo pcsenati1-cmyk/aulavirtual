@@ -15,6 +15,8 @@ export const StudentMessagesPage = () => {
   const [form, setForm] = useState({ para_usuario_id: '', asunto: '', contenido: '' });
   const [selected, setSelected] = useState(null);
 
+  const [tab, setTab] = useState('recibidos');
+
   useEffect(() => {
     loadMensajes();
     usuarioService.obtenerTodos({ limit: 100 }).then(r => {
@@ -25,8 +27,7 @@ export const StudentMessagesPage = () => {
   const loadMensajes = async () => {
     try {
       const r = await mensajeService.getBandeja();
-      const all = [...(r.recibidos || []), ...(r.enviados || [])];
-      setMensajes(all);
+      setMensajes(r);
     } catch { } finally { setLoading(false); }
   };
 
@@ -58,15 +59,15 @@ export const StudentMessagesPage = () => {
     }
   };
 
-  const recibidos = mensajes.filter(m => m.para_usuario_id === user?.id);
-  const enviados = mensajes.filter(m => m.de_usuario_id === user?.id);
+  const lista = tab === 'recibidos' ? (mensajes.recibidos || []) : (mensajes.enviados || []);
+  const noLeidos = (mensajes.recibidos || []).filter(m => !m.leido).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0 }}>Mensajes</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{recibidos.filter(m => !m.leido).length} sin leer</p>
+          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{noLeidos} sin leer</p>
         </div>
         <button onClick={() => setShowForm(!showForm)}
           style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px', background: ACCENT, color: '#fff', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
@@ -103,19 +104,30 @@ export const StudentMessagesPage = () => {
         </div>
       )}
 
+      <div style={{ display: 'flex', gap: 8 }}>
+        {[['recibidos', 'Recibidos'], ['enviados', 'Enviados']].map(([key, label]) => (
+          <button key={key} onClick={() => { setTab(key); setSelected(null); }}
+            style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #d1fae5', fontSize: 13, fontWeight: 600, cursor: 'pointer', background: tab === key ? ACCENT : '#fff', color: tab === key ? '#fff' : '#374151' }}>
+            {label}{key === 'recibidos' && noLeidos > 0 ? ` (${noLeidos})` : ''}
+          </button>
+        ))}
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1fr' : '1fr', gap: 16 }}>
         <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #d1fae5', overflow: 'hidden' }}>
           <div style={{ padding: '14px 18px', borderBottom: '1px solid #f0fdf4', background: '#f0fdf4' }}>
-            <p style={{ fontWeight: 700, fontSize: 13, color: '#064e3b', margin: 0 }}>📥 Recibidos ({recibidos.length})</p>
+            <p style={{ fontWeight: 700, fontSize: 13, color: '#064e3b', margin: 0 }}>{tab === 'recibidos' ? '📥 Recibidos' : '📤 Enviados'} ({lista.length})</p>
           </div>
           {loading ? <p style={{ padding: 20, color: '#9ca3af', fontSize: 13 }}>Cargando...</p> :
-            recibidos.length === 0 ? <p style={{ padding: 20, color: '#9ca3af', fontSize: 13, textAlign: 'center' }}>Sin mensajes</p> :
-              recibidos.map(m => (
+            lista.length === 0 ? <p style={{ padding: 20, color: '#9ca3af', fontSize: 13, textAlign: 'center' }}>Sin mensajes</p> :
+              lista.map(m => (
                 <div key={m.id} onClick={() => handleOpen(m)}
-                  style={{ padding: '12px 18px', borderBottom: '1px solid #f0fdf4', cursor: 'pointer', background: selected?.id === m.id ? '#f0fdf4' : !m.leido ? '#f9fffe' : '#fff', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  {m.leido ? <MailOpen size={15} color="#9ca3af" style={{ marginTop: 2, flexShrink: 0 }} /> : <Mail size={15} color={ACCENT} style={{ marginTop: 2, flexShrink: 0 }} />}
+                  style={{ padding: '12px 18px', borderBottom: '1px solid #f0fdf4', cursor: 'pointer', background: selected?.id === m.id ? '#f0fdf4' : !m.leido && tab === 'recibidos' ? '#f9fffe' : '#fff', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  {m.leido || tab === 'enviados' ? <MailOpen size={15} color="#9ca3af" style={{ marginTop: 2, flexShrink: 0 }} /> : <Mail size={15} color={ACCENT} style={{ marginTop: 2, flexShrink: 0 }} />}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: m.leido ? 400 : 700, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.de_nombre}</p>
+                    <p style={{ fontSize: 13, fontWeight: !m.leido && tab === 'recibidos' ? 700 : 400, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {tab === 'recibidos' ? m.de_nombre : m.para_nombre}
+                    </p>
                     <p style={{ fontSize: 12, color: '#6b7280', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.asunto || 'Sin asunto'}</p>
                   </div>
                 </div>
